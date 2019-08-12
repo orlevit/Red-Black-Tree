@@ -14,5 +14,5 @@ _Algorithm_ : using a red-black tree that stores k elements.\
 
 
 Files:
-- Red-Black-Tree             - The code with comments(the arraysmn and k are defined within).
+- Red-Black-Tree.txt         - The code with comments(the arraysmn and k are defined within).
 - Red-Black-Tree-Executable  - Executable of the code
