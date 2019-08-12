@@ -10,4 +10,4 @@ _Algorithm_ : using a red-black tree that stores k elements.\
               a cost of teta of log k and then insert = in total: teta of log k.\
               print the min elements by order is done by inorder traversal in cost of teta of k.\
               space complexity: in any given moment only the k (at most) elements in the red_black\
-              tree are saved.
+<br />tree are saved.
