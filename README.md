@@ -1,7 +1,7 @@
 # Red-Black-Tree
 
-In this project online algorithm is designed(Online space) for the next problem, written in C language:
-&nbsp;&nbsp;&nbsp;&nbsp;Input : An array of numbers of length ݊n and number k݇
+In this project online algorithm is designed(Online space) for the next problem, written in C language:\
+&nbsp;&nbsp;&nbsp;&nbsp;Input : An array of numbers of length ݊n and number k݇\
 &nbsp;&nbsp;&nbsp;&nbsp;Output: A list of the k smallest elements in the array in ascending order.
  
 _Algorithm_ : using a red-black tree that stores k elements.\
@@ -14,5 +14,5 @@ _Algorithm_ : using a red-black tree that stores k elements.\
 
 
 Files:
-- project.ipynb  - The code with comments(the arraysmn and k are defined within).
-- Run_model.py   - Executable of the code
+- Red-Black-Tree             - The code with comments(the arraysmn and k are defined within).
+- Red-Black-Tree-Executable  - Executable of the code
