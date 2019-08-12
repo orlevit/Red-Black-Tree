@@ -1,0 +1,474 @@
+Algorithm: using a red-black tree that stores k elements.
+           insert element into a red-black tree takes teta of log k, if the new elements is smaller
+           than the bigest one in the tree(and the tree contains k elements) than do delete first in
+           a cost of teta of log k and then insert = in total: teta of log k.
+           print the min elements by order is done by inorder traversal in cost of teta of k.
+           space complexity: in any given moment only the k (at most) elements in the red_black
+           tree are saved.
+
+Functions connections: the main program calls the runAlgorithmForArray procedure that
+                       gets each time an array (A,B,C) and preform initialization of the array randomized
+                       from 0..1023 and then run from the start of the array untill the end and
+                       filling the red-balck tree by inserting the elements with the function "rbInsert"
+                       that uses "rbInsertFixUp","leftRotate","rightRotate"  to maintain the characters of
+                       the balanced RB tree.
+                       if the number of nodes are bigger than K elements,it is checked with the function
+                       "Tree_Maximom" that finds the maximum of the tree, than delete the biggerst element in
+                       the tree with function "rbDelete" that uses  "rbDeleteFixUp","leftRotate","rightRotate"
+                       "Tree_Successor","Tree_Minimum" to maintain the characters of the balanced RB tree,
+                       and than insert the new element from the array with the function "rbInsert".
+                       after we finished run all over the array then the sorted tree is printed by the
+                       procedure "printkMin".
+                       *all the calls between the known functions (e.g. rbDelete,rbInsert etc) are as
+                       appears in the textbook.
+
+
+Prove correctness: all the procedures are copied from the algorithms the written in the textbook and
+                   the booklet as follows(*Because instead of defining a nil node, I used NULL,
+                   a couple of changes in the code needed to be done):
+
+                   leftRotate: Textbook,Pg. 234.
+                               changes: added a check if the right child of the parent is not NULL if it is
+                                        there is no point to switch between a node and a nil node.
+                                        (line 1 in the textbook,line 120 in the program)
+                                        added a check if the left child of the parent is NULL.
+                                        (line 8 in the textbook,line 129 in the program)
+
+                   rightRotate: booklet,Pg. 187.
+                               changes: added a check if the left child of the parent is not NULL if it is
+                                        there is no point to switch between a node and a nil node.
+                                        (line 1 in the textbook,line 141in the program)
+                                        added a check if the right child of the parent is NULL.
+                                        (line 8 in the textbook,line 150in the program)
+
+                   rbInsertFixUp: Textbook,Pg. 236.
+                                  changes:  added a check if  z is not the root than we need to finish the check .
+                                            (line 1 in the textbook,line 163 in the program)
+                                            added a check if the left child of the grandfather is NULL.
+                                            (line 2 in the textbook,line 164 in the program)
+                                            added a check if y different than NULL, NULL value means it is a nil node
+                                            and has color black.
+                                            (line 4 in the textbook,line 166 in the program)
+                                            added a check if the right child of the father is NULL.
+                                            (line 9 in the textbook,line 173 in the program)
+                                             likewise on the else with exchanging LEFT and RIGHT.
+                   rbInsert: Textbook,Pg. 236.
+                             changes:  added a check if the tree is empty and if so create a first node.
+			 (line 2 in the textbook,line 215 in the program)
+                   Tree_Minimum: Textbook,Pg. 217.
+                   Tree_Maximum: Textbook,Pg. 217.
+                   Tree_Successor: Textbook,Pg. 218.
+                   rbDeleteFixUp: Textbook,Pg. 243.
+                                  changes: added a check if the color of x is black or it is NULL(nil nodes have
+                                           black color).
+                                           (line 1 in the textbook,line 274 in the program)
+                                           added a check if the color of w left child is black or it is NULL or
+                                           the color of w right child is black or it is NULL(nil nodes have
+                                           black color).
+                                           (line 9 in the textbook,line 287 in the program)
+                                           added a check if the color of w right child black or it is NULL,if it is a
+                                           NULL a the same handle is made without the child change.
+                                           (line 12 in the textbook,line 294 in the program)
+                                           added a check if  w right child is not NULL.
+                                           (line 19 in the textbook,line 311 in the program)
+                                           likewise on the else with exchanging LEFT and RIGHT.
+                   rbDelete: Textbook,Pg. 242.
+                             changes: added a check if x is not NULL.
+                                      (line 7 in the textbook,line 375 in the program)
+                                      added a check if y is black or is it NULL(nil nodes have black color).
+                                      (line 16 in the textbook,line 386 in the program)
+                                      added a check if y is black and x is NULL and the tree is not empty,a dummy node
+                                      is create following the conditions set before for setting the node and his parent
+                                      y so rbDeleteFixUp will fix the tree correctly, the node color is red because
+                                      there are no nil black nodes,so if would put it as a black the fifth property of
+                                      the tree will be violated and because we delete it anyhow, afterwards delete the 
+                                      dummy node the color red is putted and set the correct left\right child of the
+                                      parent y to NULL accordingly.
+                                      (line 17 in the textbook,line 388 in the program)
+                   printkMin: Textbook,Pg. 214.
+
+
+----------------------------------------------------------------------------------------------------------------------*/
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+
+
+#define ARR_A_SIZE 200                    /*array A size*/
+#define ARR_B_SIZE 400                    /*array B size*/
+#define ARR_C_SIZE 800                    /*array C size*/
+#define K1 10                             /*K1 connected to A*/
+#define K2 50                             /*K2 connected to B*/
+#define K3 100                            /*K3 connected to C*/
+#define UPPER_LIMIT 1023 + 1              /*the array values range from 0 to 1023*/
+
+
+/*The red black tree of the k smallest elements*/
+struct rbtNode{
+    int key;
+    char color;
+    struct rbtNode *left;
+    struct rbtNode *right;
+    struct rbtNode *parent;
+};
+
+
+/*left rotate*/
+void leftRotate(struct rbtNode **root,struct rbtNode *x){
+    struct rbtNode *y;
+    if ( x->right != NULL) {
+        y = x->right;  //Set y
+        x->right = y->left; // Turn y's left subtree into x's right subtree
+        if (y->left != NULL) {
+            y->left->parent = x; //Bridge the y's left sublink
+        }
+        y->parent = x->parent; //Bridge x's old parent and y's parent
+        if (x->parent == NULL) {
+            *root = y;
+        } else if ((x->parent->left != NULL) && (x->key == x->parent->left->key)) {
+            x->parent->left = y; //Bridge x's old parent's left or right child
+        } else x->parent->right = y;
+        y->left = x; //put x on y's left
+        x->parent = y; //Take care of x's parent
+    }
+    return;
+}
+
+/*right rotate*/
+void rightRotate(struct rbtNode **root,struct rbtNode *x){
+    struct rbtNode *y;
+    if ( x->left != NULL) {
+        y = x->left; //set y
+        x->left = y->right; //Turn x's right subtree into y's left subtree
+        if (y->right != NULL) {
+            y->right->parent = x;
+        }
+        y->parent = x->parent; //Bridge x's old parent and y's parent
+        if (x->parent == NULL) {
+            *root = y;
+        } else if ((x->parent->right != NULL) && (x->key == x->parent->right->key)) {
+            x->parent->right = y; //Bridge x's old parent's left or right child
+        } else x->parent->left = y;
+        y->right = x; //put x on y's right
+        x->parent = y; //Take care of x's parent
+    }
+    return;
+
+}
+
+/*fix the red black tree after insertion of an element*/
+void rbInsertFixUp(struct rbtNode **root,struct rbtNode *z){
+    struct rbtNode *y;
+    while ((z != *root) &&(z->parent->color == 'r')){
+        if ((z->parent->parent->left != NULL)&&(z->parent->key == z->parent->parent->left->key)){
+            y = z->parent->parent->right;
+            if ((y != NULL)&&(y->color == 'r')){
+                z->parent->color = 'b';
+                y->color = 'b';
+                z->parent->parent->color = 'r';
+                z = z->parent->parent;
+            }
+            else {
+                if ((z->parent->right != NULL) && (z->key == z->parent->right->key)) {
+                    z = z->parent;
+                    leftRotate(root, z);
+                }
+
+                z->parent->color = 'b';
+                z->parent->parent->color = 'r';
+                rightRotate(root, z->parent->parent);
+            }
+        }
+        else {
+            y = z->parent->parent->left;
+            if ((y != NULL)&&(y->color == 'r')){
+                z->parent->color = 'b';
+                y->color = 'b';
+                z->parent->parent->color = 'r';
+                z = z->parent->parent;
+            }
+            else {
+                if ((z->parent->left != NULL) && (z->key == z->parent->left->key)) {
+                    z = z->parent;
+                    rightRotate(root, z);
+                }
+
+                z->parent->color = 'b';
+                z->parent->parent->color = 'r';
+                leftRotate(root, z->parent->parent);
+            }
+        }
+    }
+    (*root)->color = 'b';
+}
+
+/*insert an element to the tree*/
+void rbInsert(struct rbtNode **root, int val) {
+    struct rbtNode *z = (struct rbtNode*)malloc(sizeof(struct rbtNode));
+    z->key = val;
+    z->left = NULL;
+    z->right = NULL;
+    z->parent = NULL;
+    z->color = 'r';
+    struct rbtNode *x = *root;
+    struct rbtNode *y = NULL;
+    if (*root == NULL ){
+        *root = z;
+        z->parent = NULL;
+        (*root)->color = 'b';
+        return;
+    }
+    while ( x != NULL){
+        y = x;
+        if ( z->key < x->key){
+            x = x->left;
+        }
+        else x = x->right;
+    }
+    z->parent = y;
+    if ( y == NULL){
+        *root = z;
+    }
+    else if( z->key < y->key ){
+        y->left = z;
+    }
+    else y->right = z;
+    rbInsertFixUp(root,z);
+
+    return;
+}
+
+/*The minimum element of the tree*/
+struct rbtNode* Tree_Minimum(struct rbtNode *x){
+    while (x->left != NULL)
+        x = x->left;
+    return x;
+}
+/*the maximum element of the tree*/
+
+struct rbtNode* Tree_Maximom(struct rbtNode *x){
+    while (x->right != NULL)
+        x = x->right;
+    return x;
+}
+/*the successor element of the current one*/
+struct rbtNode* Tree_Successor(struct rbtNode *x){
+    struct rbtNode *y = NULL;
+    if (x->right != NULL)
+        Tree_Minimum(x->right);
+    y = x->right;
+    while ((y != NULL) && (x == y->right))
+    {
+        x = y;
+        y = x->parent;
+    }
+    return y;
+}
+
+
+/*fix the red black tree after delete an element*/
+void rbDeleteFixUp(struct rbtNode **root,struct rbtNode *x){
+    struct rbtNode *w = NULL;
+
+    while  ((x != *root) && ((x == NULL) || (x->color == 'b'))) {
+        if (x == x->parent->left) {
+            w = x->parent->right; // w is x's brother
+
+            // CASE1
+            if (w->color == 'r') {
+                w->color = 'b';
+                x->parent->color = 'r';
+                leftRotate(root, x->parent);
+                w = x->parent->right;
+            } // CASE1
+
+            // CASE2
+            if (((w->left == NULL) || (w->left->color == 'b')) && ((w->right == NULL) || (w->right->color == 'b'))){
+                w->color = 'r';
+                x = x->parent;
+            } // CASE2
+
+                //CASE3
+            else {
+                if (w->right == NULL) {
+                    w->color = 'r';
+                    if(w->left != NULL)
+                        rightRotate(root, w);
+                    w = x->parent->right;
+                }
+                else if (w->right->color == 'b') {
+                    w->left->color = 'b';
+                    w->color = 'r';
+                    rightRotate(root, w);
+                    w = x->parent->right;
+                }// CASE3
+
+
+                //CASE4
+                w->color = x->parent->color;
+                x->parent->color = 'b';
+                if (w->right != NULL)
+                    w->right->color = 'b';
+                leftRotate(root, x->parent);
+                x = *root;
+            }
+        }
+        else{
+            w = x->parent->left; // w is x's brother
+
+            // CASE1
+            if (w->color == 'r') {
+                w->color = 'b';
+                x->parent->color = 'r';
+                rightRotate(root, x->parent);
+                w = x->parent->left;
+            } // CASE1
+
+            // CASE2
+            if (((w->right == NULL) || (w->right->color == 'b')) && ((w->left == NULL) || (w->left->color == 'b'))) {
+                w->color = 'r';
+                x = x->parent;
+            } // CASE2
+
+                //CASE3
+            else {
+                if (w->left == NULL) {
+                    w->color = 'r';
+                    if(w->right != NULL)
+                        leftRotate(root, w);
+                    w = x->parent->left;
+                }
+                else if (w->left->color == 'b') {
+                    w->right->color = 'b';
+                    w->color = 'r';
+                    leftRotate(root, w);
+                    w = x->parent->left;
+                }// CASE3
+
+
+                //CASE4
+                w->color = x->parent->color;
+                x->parent->color = 'b';
+                if (w->left != NULL)
+                    w->left->color = 'b';
+                rightRotate(root, x->parent);
+                x = *root;
+            }
+        }
+    }
+    x->color = 'b';
+}
+
+/*Delete an element in the red black tree*/
+void rbDelete(struct rbtNode **root,struct rbtNode *z) {
+    struct rbtNode *y = NULL;
+    struct rbtNode *x = NULL;
+    if ((z->left == NULL) || (z->right==NULL))
+        y = z;
+    else
+        y = Tree_Successor(z);
+    if (z->left != NULL)
+        x = y->left;
+    else
+        x = y->right;
+    if (x != NULL)
+        x->parent = y->parent;
+
+    if (y->parent == NULL)
+        *root = x;
+    else if (y == y->parent->left)
+        y->parent->left = x;
+    else
+        y->parent->right = x;
+    if (y != z)
+        z->key = y->key;
+    if ((y->color == 'b') && (x != NULL))
+        rbDeleteFixUp(root,x);
+    else if ((y->color == 'b') && (x == NULL) && ((*root) != NULL)) {
+        x = (struct rbtNode*)malloc(sizeof(struct rbtNode));
+        x->left = NULL;
+        x->right = NULL;
+        x->parent = y->parent;
+        x->color = 'r';
+        if (y->parent == NULL)
+            *root = x;
+        else if (y == y->parent->left) {
+            y->parent->left = x;
+            rbDeleteFixUp(root, x);
+            y->parent->left =NULL;
+        }
+        else {
+            y->parent->right = x;
+            rbDeleteFixUp(root, x);
+            y->parent->right=NULL;
+        }
+
+        free(x);
+    }
+    free(y);   //free the deleted node
+}
+
+/*Print the tree in a sorted way -based on inorder Traversal algorithm*/
+void printkMin(struct rbtNode* root){
+    struct rbtNode* temp = root;
+    if (temp != NULL){
+        printkMin(temp->left);
+        printf(" %d\t",temp->key);
+        printkMin(temp->right);
+    }
+    return;
+}
+
+/*Get each time an array (A,B,C) and preform the algorithm the requested*/
+void runAlgorithmForArray(struct rbtNode** root, int A[],int size,int K){
+
+    int n1,n2,n3,i;                 /*the four check points and an index for the for loop*/
+    /*initialized the A array*/
+    srand ( time(NULL) );
+    for (i = 0; i < size; i++)
+    {
+        A[i] = rand()%(UPPER_LIMIT);
+    }
+
+    /*set the checking points*/
+    n1 = size/4;
+    n2 = 2*size/4;
+    n3 = 3*size/4;
+    for (i = 0; i < size; i++)
+    {
+        if (i < K)              /*insert the k values without checking to the tree*/
+            rbInsert(root,A[i]);
+        else if((Tree_Maximom(*root))->key > A[i]){      /*if the maximum value in the tree bigger than the current,
+                                                           delete maximum and insert new value*/
+            rbDelete(root,Tree_Maximom(*root));
+            rbInsert(root,A[i]);
+        }
+        if ((i == n1) || (i == n2) || (i == n3)) {      /*print the k tree for the checking points*/
+            printf("For check point n=%d\n",i);
+            printkMin(*root);
+            printf("\n");
+        }
+    }
+    printf("\n");
+    return;
+}
+
+
+int main(int argc, char* argv[]){
+    /*The tree roots for A,B,C*/
+    struct rbtNode* root1 = NULL;
+    struct rbtNode* root2 = NULL;
+    struct rbtNode* root3 = NULL;
+
+    int A[ARR_A_SIZE],B[ARR_B_SIZE],C[ARR_C_SIZE];
+
+    printf("Array A:\n");
+    runAlgorithmForArray(&root1,A,ARR_A_SIZE,K1);
+    printf("Array B:\n");
+    runAlgorithmForArray(&root2,B,ARR_B_SIZE,K2);
+    printf("Array C:\n");
+    runAlgorithmForArray(&root3,C,ARR_C_SIZE,K3);
+
+     system("pause");
+    return 0;
+}
