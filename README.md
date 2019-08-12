@@ -1,8 +1,8 @@
 # Red-Black-Tree
 
 In this project online algorithm is designed(Online space) for the next problem, written in C language:
-  - Input : An array of numbers of length ݊n and number k݇
-  - Output: A list of the k smallest elements in the array in ascending order.
+&nbsp;&nbsp;&nbsp;&nbsp;Input : An array of numbers of length ݊n and number k݇
+&nbsp;&nbsp;&nbsp;&nbsp;Output: A list of the k smallest elements in the array in ascending order.
  
 _Algorithm_ : using a red-black tree that stores k elements.\
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;insert element into a red-black tree takes teta of log k, if the new elements is smaller\
@@ -11,3 +11,8 @@ _Algorithm_ : using a red-black tree that stores k elements.\
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;print the min elements by order is done by inorder traversal in cost of teta of k.\
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;space complexity: in any given moment only the k (at most) elements in the red_black\
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;tree are saved.
+
+
+Files:
+- project.ipynb  - The code with comments(the arraysmn and k are defined within).
+- Run_model.py   - Executable of the code
