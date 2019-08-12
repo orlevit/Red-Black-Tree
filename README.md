@@ -1,8 +1,8 @@
 # Red-Black-Tree
 
 In this project online algorithm is designed(Online space) for the next problem, written in C language:\
-&nbsp;&nbsp;&nbsp;&nbsp;Input : An array of numbers of length ݊n and number k݇\
-&nbsp;&nbsp;&nbsp;&nbsp;Output: A list of the k smallest elements in the array in ascending order.
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Input &nbsp;: An array of numbers of length ݊n and number k݇\
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Output: A list of the k smallest elements in the array in ascending order.
  
 _Algorithm_ : using a red-black tree that stores k elements.\
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;insert element into a red-black tree takes teta of log k, if the new elements is smaller\
